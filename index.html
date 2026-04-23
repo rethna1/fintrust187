@@ -232,6 +232,41 @@ th{
 
 <script>
 
+// 🔐 UNIQUE APP SECRET (CHANGE THIS FOR EACH DISTRIBUTOR)
+const APP_ID = "FINTRUST-USER-001";
+
+// GET DEVICE ID
+function getDeviceId(){
+let id = localStorage.getItem("deviceId");
+
+if(!id){
+id = "DEV-" + Math.random().toString(36).substr(2,9);
+localStorage.setItem("deviceId", id);
+}
+return id;
+}
+
+// CREATE LOCK KEY
+function getLockKey(){
+return "lock_" + APP_ID;
+}
+
+let storedDevice = localStorage.getItem(getLockKey());
+let currentDevice = getDeviceId();
+
+// FIRST TIME USE → LOCK DEVICE
+if(!storedDevice){
+localStorage.setItem(getLockKey(), currentDevice);
+}else{
+
+// BLOCK OTHER DEVICES
+if(storedDevice !== currentDevice){
+document.body.innerHTML = "<h2 style='text-align:center;color:red;'>Access Denied<br>This license is already used on another device</h2>";
+throw new Error("Blocked");
+}
+
+}
+
 function formatCurrency(num){
   return "₹ " + Math.round(num).toLocaleString("en-IN");
 }
@@ -360,37 +395,6 @@ calculateLump();
         © <span id="year"></span> FinTrust Creations. All Rights Reserved.
     </p>
 </div>
-
-<script>
-
-// CREATE UNIQUE DEVICE ID
-function getDeviceId(){
-let id = localStorage.getItem("deviceId");
-
-if(!id){
-id = "DEV-" + Math.random().toString(36).substr(2,9);
-localStorage.setItem("deviceId", id);
-}
-return id;
-}
-
-// MASTER ALLOWED DEVICE (SET FIRST USER)
-let allowedDevice = localStorage.getItem("allowedDevice");
-
-// FIRST TIME SET
-if(!allowedDevice){
-localStorage.setItem("allowedDevice", getDeviceId());
-}else{
-
-// BLOCK OTHER DEVICES
-if(allowedDevice !== getDeviceId()){
-document.body.innerHTML = "<h2 style='text-align:center;color:red;'>Access Denied<br>This app is locked to another device</h2>";
-throw new Error("Blocked");
-}
-
-}
-
-</script>
 
 <script>
 document.getElementById("year").textContent = new Date().getFullYear();
